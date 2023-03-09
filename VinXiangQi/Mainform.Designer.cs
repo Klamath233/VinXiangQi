@@ -36,7 +36,7 @@
             this.groupBox_picturebox = new System.Windows.Forms.GroupBox();
             this.pictureBox_show_result = new System.Windows.Forms.PictureBox();
             this.groupBox_result_board = new System.Windows.Forms.GroupBox();
-            this.pictureBox_board = new System.Windows.Forms.PictureBox();
+            this.pictureBox_board = new DisplayBoardView();
             this.groupBox_engine_settings = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel_engine = new System.Windows.Forms.TableLayoutPanel();
             this.checkBox_auto_scroll = new System.Windows.Forms.CheckBox();
@@ -1013,7 +1013,7 @@
         private System.Windows.Forms.GroupBox groupBox_picturebox;
         private System.Windows.Forms.PictureBox pictureBox_show_result;
         private System.Windows.Forms.GroupBox groupBox_result_board;
-        private System.Windows.Forms.PictureBox pictureBox_board;
+        private DisplayBoardView pictureBox_board;
         private System.Windows.Forms.GroupBox groupBox_engine_settings;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel_engine;
         private System.Windows.Forms.GroupBox groupBox_engine_basic;

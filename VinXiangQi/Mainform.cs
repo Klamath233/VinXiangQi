@@ -15,7 +15,7 @@ using System.Drawing.Drawing2D;
 using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
-
+using static VinXiangQi.DisplayBoardViewModel;
 
 namespace VinXiangQi
 {
@@ -337,7 +337,7 @@ namespace VinXiangQi
         {
             pictureBox_board.Image = BoardDisplayBitmap;
             BoardGDI = Graphics.FromImage(BoardDisplayBitmap);
-            RenderDisplayBoard();
+            pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
         }
 
         void InitEngine()

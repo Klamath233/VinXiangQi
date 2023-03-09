@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
+using static VinXiangQi.DisplayBoardViewModel;
 
 namespace VinXiangQi
 {
@@ -195,81 +196,6 @@ namespace VinXiangQi
                     Thread.Sleep((int)(550 - miliSec));
                 }
             }
-        }
-
-        public void RenderDisplayBoard()
-        {
-            if (CurrentBoard == null) return;
-            this.Invoke(new Action(() =>
-            {
-                int width = 40;
-                int height = 40;
-                int xoffset = width / 2;
-                int yoffset = height / 2;
-                BoardGDI.Clear(Color.White);
-                BoardGDI.DrawImage(Properties.Resources.board, 0, 0, width * 10, height * 11);
-                // draw chess
-                for (int y = 0; y < 10; y++)
-                {
-                    for (int x = 0; x < 9; x++)
-                    {
-                        if (CurrentBoard[x, y] != null && CurrentBoard[x, y] != "")
-                        {
-                            string name = CurrentBoard[x, y];
-                            BoardGDI.DrawImage((Bitmap)Properties.Resources.ResourceManager.GetObject(CurrentBoard[x, y]), x * width + xoffset, y * height + yoffset, width, height);
-                        }
-                    }
-                }
-                // draw hint
-                Pen rp = new Pen(Color.FromArgb(180, Color.OrangeRed), 10);
-                Pen bp = new Pen(Color.FromArgb(180, Color.Blue), 10);
-                Pen rp_dim = new Pen(Color.FromArgb(180, Color.DarkOrange), 8);
-                Pen bp_dim = new Pen(Color.FromArgb(180, Color.DarkGreen), 8);
-                rp.EndCap = LineCap.ArrowAnchor;
-                bp.EndCap = LineCap.ArrowAnchor;
-                rp_dim.EndCap = LineCap.ArrowAnchor;
-                bp_dim.EndCap = LineCap.ArrowAnchor;
-                if (BestMove.From.X != -1)
-                {
-                    Point bestFrom = new Point(BestMove.From.X * width + xoffset + width / 2, BestMove.From.Y * height + yoffset + height / 2);
-                    Point bestTo = new Point(BestMove.To.X * width + xoffset + width / 2, BestMove.To.Y * height + yoffset + height / 2);
-                    if (RedSide)
-                    {
-                        BoardGDI.DrawLine(rp, bestFrom, bestTo);
-                    }
-                    else
-                    {
-                        BoardGDI.DrawLine(bp, bestFrom, bestTo);
-                    }
-                }
-                if (PonderMove.From.X != -1)
-                {
-                    Point ponderFrom = new Point(PonderMove.From.X * width + xoffset + width / 2, PonderMove.From.Y * height + yoffset + height / 2);
-                    Point ponderTo = new Point(PonderMove.To.X * width + xoffset + width / 2, PonderMove.To.Y * height + yoffset + height / 2);
-                    if (RedSide)
-                    {
-                        BoardGDI.DrawLine(bp, ponderFrom, ponderTo);
-                    }
-                    else
-                    {
-                        BoardGDI.DrawLine(rp, ponderFrom, ponderTo);
-                    }
-                }
-                if (BackgroundAnalysisMove.From.X != -1)
-                {
-                    Point bgFrom = new Point(BackgroundAnalysisMove.From.X * width + xoffset + width / 2, BackgroundAnalysisMove.From.Y * height + yoffset + height / 2);
-                    Point bgTo = new Point(BackgroundAnalysisMove.To.X * width + xoffset + width / 2, BackgroundAnalysisMove.To.Y * height + yoffset + height / 2);
-                    if (RedSide)
-                    {
-                        BoardGDI.DrawLine(rp_dim, bgFrom, bgTo);
-                    }
-                    else
-                    {
-                        BoardGDI.DrawLine(bp_dim, bgFrom, bgTo);
-                    }
-                }
-                pictureBox_board.Refresh();
-            }));
         }
 
         int StableDetectionCount = 0;
@@ -616,7 +542,7 @@ namespace VinXiangQi
                 LastBoard = (string[,])CurrentBoard.Clone();
                 ExpectedSelfGoBoard = null;
                 ExpectedMove = "";
-                RenderDisplayBoard();
+                pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
                 DisplayStatus("从对手开始，跳过当前局面");
                 return;
             }
@@ -646,7 +572,7 @@ namespace VinXiangQi
             {
                 if (compareWithLast.Chess.Contains(mySymbol))
                 {
-                    RenderDisplayBoard();
+                    pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
                     if (Settings.AnalyzingMode)
                     {
                         InvalidCount = 0;
@@ -676,7 +602,7 @@ namespace VinXiangQi
             {
                 LastBoard = (string[,])CurrentBoard.Clone();
                 ExpectedMove = "";
-                RenderDisplayBoard();
+                pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
                 DisplayStatus("和预期棋盘一样，跳过");
                 return;
             }
@@ -691,7 +617,7 @@ namespace VinXiangQi
                 }
                 return;
             }
-            RenderDisplayBoard();
+            pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
             InvalidCount = 0;
             EngineAnalyzeCount++;
             LastBoard = (string[,])CurrentBoard.Clone();
@@ -879,7 +805,7 @@ namespace VinXiangQi
                     BackgroundAnalysisMove = new ChessMove(fromPoint, toPoint);
                 }
 
-                RenderDisplayBoard();
+                pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
             }
             if (info_str != "")
             {
@@ -923,7 +849,7 @@ namespace VinXiangQi
             {
                 BackgroundAnalysisMove = new ChessMove(new Point(-1, -1), new Point(-1, -1));
             }
-            RenderDisplayBoard();
+            pictureBox_board.ViewModel.DisplayBoardState = new DisplayBoardViewModelState(CurrentBoard, BestMove, PonderMove, BackgroundAnalysisMove);
             string fen = Utils.BoardToFen(CurrentBoard, mySideStr, mySideStr);
             string boardKey = fen + " moves " + bestMove;
             ExpectedSelfGoBoard = (string[,])CurrentBoard.Clone();

@@ -117,6 +117,10 @@
     <Compile Include="DetectionLogic.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="DisplayBoardView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DisplayBoardViewModel.cs" />
     <Compile Include="EngineHelper.cs" />
     <Compile Include="EngineSettingsForm.cs">
       <SubType>Form</SubType>
